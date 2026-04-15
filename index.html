@@ -3,45 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мой Каталог</title>
+    <title>Каталог товаров</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="wrapper">
         <header class="header">
-            <h1>Каталог товаров</h1>
-            <div class="cart-info">Корзина: 0 шт.</div>
+            <h1>Управление каталогом</h1>
         </header>
         
-        <div class="main-content">
-            <aside class="sidebar">
-                <h3>Фильтры</h3>
-                <ul>
-                    <li><label><input type="checkbox"> Электроника</label></li>
-                    <li><label><input type="checkbox"> Одежда</label></li>
-                    <li><label><input type="checkbox"> Обувь</label></li>
-                </ul>
-                </aside>
-
-            <main class="products">
-                <h2>Все товары</h2>
-                <div class="product-grid">
-                    <div class="product-card">
-                        <div class="product-img">Фото 1</div>
-                        <h3>Кроссовки </h3>
-                        <p class="price">3500 ₽</p>
-                        <button class="buy-btn">В корзину</button>
-                    </div>
-                    
-                    <div class="product-card">
-                        <div class="product-img">Фото 2</div>
-                        <h3>Рюкзак </h3>
-                        <p class="price">1200 ₽</p>
-                        <button class="buy-btn">В корзину</button>
-                    </div>
+        <main class="main-content">
+            <section class="lab-controls">
+                <h3>Интерактивные тесты:</h3>
+                <div class="buttons-group">
+                    <button id="btn-input">Ввод данных</button>
+                    <button id="btn-logic">Проверка условий</button>
+                    <button id="btn-loop">Показать все товары</button>
                 </div>
-            </main>
-        </div>
+            </section>
+
+            <section class="output-section">
+                <h3>Результат выполнения:</h3>
+                <div id="output-board" style="padding: 15px; border: 1px dashed #cb11ab; min-height: 50px; margin-top: 10px;"></div>
+            </section>
+        </main>
     </div>
 
     <script src="script.js"></script>
