@@ -3,32 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Каталог товаров</title>
+    <title>Лабораторная работа №3 — Каталог товаров</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="wrapper">
-        <header class="header">
-            <h1>Управление каталогом</h1>
-        </header>
-        
-        <main class="main-content">
-            <section class="lab-controls">
-                <h3>Интерактивные тесты:</h3>
-                <div class="buttons-group">
-                    <button id="btn-input">Ввод данных</button>
-                    <button id="btn-logic">Проверка условий</button>
-                    <button id="btn-loop">Показать все товары</button>
-                </div>
-            </section>
 
-            <section class="output-section">
-                <h3>Результат выполнения:</h3>
-                <div id="output-board" style="padding: 15px; border: 1px dashed #cb11ab; min-height: 50px; margin-top: 10px;"></div>
-            </section>
-        </main>
-    </div>
+    <header>
+        <h1>Управление каталогом товаров</h1>
+    </header>
 
+    <main>
+        <section class="controls">
+          <button id="btn-show-all">Показать все</button>
+    
+          <select id="category-select">
+            <option value="Все">Все категории</option>
+            <option value="Электроника">Электроника</option>
+            <option value="Аксессуары">Аксессуары</option>
+            <option value="Бытовая техника">Бытовая техника</option>
+          </select>
+    
+          <button id="btn-search">Поиск</button>
+          <button id="btn-sort-price">Сортировать</button>
+        </section>
+
+        <section id="stats-panel">
+            <p id="message">Нажмите «Показать все», чтобы загрузить данные...</p>
+        </section>
+
+        <section id="output-board" class="catalog-grid">
+            </section>
+    </main>
+
+    <script src="data.js"></script>    
+    <script src="logic.js"></script>
     <script src="script.js"></script>
+
 </body>
 </html>
