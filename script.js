@@ -1,83 +1,99 @@
-// --- 2.1. Типы данных: примитивы и объекты ---
-const shopName = "Global Trade";
-let itemsCount = 150;           
-let isOpen = true;               
-let saleManager = null;          
+// 1. Находим основные элементы на странице
+const outputBoard = document.getElementById('output-board');
+const messageBox = document.getElementById('message');
+const categorySelect = document.getElementById('category-select');
 
-// Объект товара
-const mainProduct = {
-    id: 101,
-    title: "Игровой монитор",
-    price: 25000,
-    category: "Электроника",
-    inStock: true
-};
+/**
+* Основная функция отрисовки списка товаров
+* @param {Array} items 
+*/
 
-console.log("Название магазина:", shopName, "| Тип:", typeof shopName);
-console.log("Пример объекта товара:", mainProduct);
+function renderList(items) {
+    // Очищаем контейнер перед отрисовкой
+    outputBoard.innerHTML = '';
 
-
-// --- 2.2. Приведение типов и ввод данных ---
-document.getElementById('btn-input').onclick = function() {
-    let userPrice = prompt("Введите желаемую цену товара:", "500");
-    
-    let numericPrice = Number(userPrice);
-    
-    if (isNaN(numericPrice)) {
-        alert("Ошибка! Вы ввели не число.");
-    } else {
-        let message = "Цена зафиксирована: " + numericPrice + " руб.";
-        document.getElementById('output-board').innerText = message;
-        console.log("Тип после приведения:", typeof numericPrice);
+    // Если массив пустой — выводим уведомление
+    if (items.length === 0) {
+        outputBoard.innerHTML = '<p class="empty-msg">Товары не найдены или категория пуста.</p>';
+        messageBox.textContent = 'Результатов: 0. Сумма: 0 руб.';
+        return;
     }
-};
 
+    // Проходим по массиву и создаем карточки 
+    items.forEach(product => {
+        const card = document.createElement('div');
+        card.className = 'product-card';
 
-// --- 2.3. Операторы: арифметика, сравнение, логика ---
-function calculateDiscount(price, percent) {
-    let discountSum = (price * percent) / 100;
-    return price - discountSum;
+        // Наполняем карточку шаблоном. 
+        card.innerHTML = `
+            <h3>${product.title}</h3>
+            <div class="info">
+                <p>Категория: <span>${product.category}</span></p>
+                <p>Цена: <strong>${product.price} руб.</strong></p>
+            </div>
+            <button class="delete-btn" data-id="${product.id}">Удалить товар</button>
+        `;
+
+        outputBoard.appendChild(card);
+    });
+
+    // Обновляем статистику 
+    const total = calculateTotal(items); 
+    messageBox.textContent = `Показано товаров: ${items.length}. Общая стоимость: ${total} руб.`;
 }
 
+// --- ОБРАБОТЧИКИ СОБЫТИЙ ---
 
-let isPremium = true;
-let currentPrice = 5000;
-if (currentPrice > 3000 && isPremium) {
-    console.log("Доступна бесплатная доставка");
-}
+// 2. Кнопка "Показать все"
+document.getElementById('btn-show-all').onclick = () => {
+    categorySelect.value = "Все"; 
+    renderList(catalog);
+};
 
+// 3. Динамический фильтр по категориям 
+categorySelect.onchange = () => {
+    const selectedValue = categorySelect.value;
+    const filtered = filterByCategory(catalog, selectedValue); 
+    renderList(filtered);
+};
 
-// --- 2.4. Условия: ветвление (if/else, switch) ---
-document.getElementById('btn-logic').onclick = function() {
-    let category = "Электроника";
-    let board = document.getElementById('output-board');
-
-    switch (category) {
-        case "Электроника":
-            board.innerText = "Выбрана категория гаджетов. Скидка 5%.";
-            break;
-        case "Одежда":
-            board.innerText = "Выбрана одежда. Скидка 10%.";
-            break;
-        default:
-            board.innerText = "Категория не определена.";
+// 4. Кнопка "Поиск по названию"
+document.getElementById('btn-search').onclick = () => {
+    const query = prompt("Введите название товара (или его часть):");
+    if (query !== null) {
+        const results = searchProducts(catalog, query); 
+        renderList(results);
     }
 };
 
-
-// --- 2.5. Циклы: for, while ---
-document.getElementById('btn-loop').onclick = function() {
-    const catalog = ["Телефон", "Ноутбук", "Наушники", "Клавиатура"];
-    let result = "Список товаров: ";
-
-    for (let i = 0; i < catalog.length; i++) {
-        result += (i + 1) + ". " + catalog[i] + " ";
-        console.log("Обработка товара:", catalog[i]);
-    }
-
-    document.getElementById('output-board').innerText = result;
+// 5. Кнопка "Сортировать по цене"
+document.getElementById('btn-sort-price').onclick = () => {
+    const sorted = sortByPrice(catalog); 
+    renderList(sorted);
 };
 
+// 6. Удаление товара 
+outputBoard.onclick = (event) => {
+    
+    if (event.target.classList.contains('delete-btn')) {
+        const idToDelete = parseInt(event.target.dataset.id);
+        
+        // Находим индекс в массиве данных
+        const index = catalog.findIndex(item => item.id === idToDelete);
+        
+        if (index !== -1) {
+            // Удаляем из исходного массива
+            catalog.splice(index, 1);
+            
+            // Перерисовываем список с учетом текущего фильтра
+            const currentCategory = categorySelect.value;
+            const updatedList = filterByCategory(catalog, currentCategory);
+            renderList(updatedList);
+        }
+    }
+};
 
-// --- 2.6. Интерактивный вывод ---
-console.log("Лабораторная работа №2 успешно инициализирована.");
+// Первичная отрисовка при загрузке страницы
+window.onload = () => {
+    renderList(catalog);
+};
