@@ -138,7 +138,7 @@ if (addForm) {
     };
 }
 
-// 9. Запуск при загрузке страницы
+// 9. Запуск 
 window.onload = () => {
     loadDataAsync();
 };
