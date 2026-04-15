@@ -2,42 +2,50 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Лабораторная работа №3 — Каталог товаров</title>
+    <title>Каталог товаров</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
     <header>
         <h1>Управление каталогом товаров</h1>
     </header>
 
     <main>
+        <section class="form-section">
+            <h3>Добавить новый товар</h3>
+            <form id="add-product-form">
+                <input type="text" id="form-title" placeholder="Название товара">
+                <input type="text" id="form-price" placeholder="Цена">
+                <select id="form-category">
+                    <option value="">Категория</option>
+                    <option value="Электроника">Электроника</option>
+                    <option value="Аксессуары">Аксессуары</option>
+                    <option value="Бытовая техника">Бытовая техника</option>
+                </select>
+                <button type="submit">Сохранить</button>
+                <div id="form-errors"></div>
+            </form>
+        </section>
+
+        <hr>
+
         <section class="controls">
-          <button id="btn-show-all">Показать все</button>
-    
-          <select id="category-select">
-            <option value="Все">Все категории</option>
-            <option value="Электроника">Электроника</option>
-            <option value="Аксессуары">Аксессуары</option>
-            <option value="Бытовая техника">Бытовая техника</option>
-          </select>
-    
-          <button id="btn-search">Поиск</button>
-          <button id="btn-sort-price">Сортировать</button>
+            <select id="filter-select">
+                <option value="">Все категории</option>
+                <option value="Электроника">Электроника</option>
+                <option value="Аксессуары">Аксессуары</option>
+                <option value="Бытовая техника">Бытовая техника</option>
+            </select>
+            <button id="sort-btn">Сортировать по цене</button>
         </section>
 
-        <section id="stats-panel">
-            <p id="message">Нажмите «Показать все», чтобы загрузить данные...</p>
-        </section>
+        <div id="product-list" class="grid-container"></div>
 
-        <section id="output-board" class="catalog-grid">
-            </section>
+        <div id="message"></div>
     </main>
 
-    <script src="data.js"></script>    
+    <script src="data.js"></script>
     <script src="logic.js"></script>
     <script src="script.js"></script>
-
 </body>
 </html>
