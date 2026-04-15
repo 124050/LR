@@ -1,48 +1,144 @@
-// 1. Поиск товаров по названию
-const searchProducts = (list, query) => {
-    return list.filter(item => item.title.toLowerCase().includes(query.toLowerCase()));
+// 1. Находим основные элементы на странице 
+const outputBoard = document.getElementById('product-list'); 
+const messageBox = document.getElementById('message');
+const categorySelect = document.getElementById('filter-select'); 
+const sortBtn = document.getElementById('sort-btn');
+
+// 2. Элементы формы
+const addForm = document.getElementById('add-product-form');
+const errorBlock = document.getElementById('form-errors');
+
+/**
+* 3. Основная функция отрисовки списка товаров
+* @param {Array} items 
+*/
+function renderList(items) {
+    // Очищаем контейнер перед отрисовкой
+    outputBoard.innerHTML = '';
+
+    // Если массив пустой — выводим уведомление
+    if (items.length === 0) {
+        outputBoard.innerHTML = '<p class="empty-msg">Товары не найдены или категория пуста.</p>';
+        messageBox.textContent = 'Результатов: 0. Сумма: 0 руб.';
+        return;
+    }
+
+    // Проходим по массиву и создаем карточки 
+    items.forEach(product => {
+        const card = document.createElement('div');
+        card.className = 'product-card';
+
+        // Наполняем карточку шаблоном
+        card.innerHTML = `
+            <h3>${product.title}</h3>
+            <div class="info">
+                <p>Категория: <span>${product.category}</span></p>
+                <p>Цена: <strong>${product.price} руб.</strong></p>
+            </div>
+            <button class="delete-btn" data-id="${product.id}">Удалить товар</button>
+        `;
+
+        outputBoard.appendChild(card);
+    });
+
+    // Обновляем статистику 
+    const total = calculateTotal(items); 
+    messageBox.textContent = `Показано товаров: ${items.length}. Общая стоимость: ${total} руб.`;
+}
+
+// --- ОБРАБОТЧИКИ СОБЫТИЙ ---
+
+// 4. Динамический фильтр по категориям 
+categorySelect.onchange = () => {
+    const selectedValue = categorySelect.value;
+    const filtered = filterByCategory(catalog, selectedValue); 
+    renderList(filtered);
 };
 
-// 2. Фильтрация по категории
-const filterByCategory = (list, category) => {
-    if (!category || category === "Все") return list;
-    return list.filter(item => item.category === category);
+// 5. Кнопка "Сортировать по цене"
+sortBtn.onclick = () => {
+    const sorted = sortByPrice(catalog); 
+    renderList(sorted);
 };
 
-// 3. Сортировка по цене 
-const sortByPrice = (list) => {
-    return [...list].sort((a, b) => a.price - b.price);
+// 6. Удаление товара 
+outputBoard.onclick = (event) => {
+    if (event.target.classList.contains('delete-btn')) {
+        const idToDelete = parseInt(event.target.dataset.id);
+        const index = catalog.findIndex(item => item.id === idToDelete);
+        
+        if (index !== -1) {
+            catalog.splice(index, 1);
+            const currentCategory = categorySelect.value;
+            const updatedList = filterByCategory(catalog, currentCategory);
+            renderList(updatedList);
+        }
+    }
 };
 
-// 4. Агрегация данных 
-const calculateTotal = (list) => {
-    return list.reduce((sum, item) => sum + item.price, 0);
-};
-
-// 5. Регулярные выражения
-const titleRegex = /^[a-zA-Zа-яА-Я0-9\s]{3,30}$/; 
-const priceRegex = /^\d+$/; 
-
-// 6. Валидация данных нового товара
+// 7. Асинхронная инициализация данных 
  
-const validateProduct = (title, price, category) => {
-    const errors = [];
+async function loadDataAsync() {
+    messageBox.textContent = "Синхронизация с базой данных...";
     
-    //  Нормализация 
-    const cleanTitle = title.trim();
+    try {
+        // Имитируем сетевую задержку
+        await new Promise(resolve => setTimeout(resolve, 1200));
+        
+        // Рендерим начальный массив данных
+        renderList(catalog);
+        messageBox.textContent = "Данные успешно загружены.";
+    } catch (error) {
+        messageBox.textContent = "Ошибка при получении данных из системы.";
+        console.error("Fetch error:", error);
+    }
+}
 
-    if (!titleRegex.test(cleanTitle)) {
-        errors.push("Название должно быть от 3 до 30 символов и без спецсимволов.");
-    }
-    if (!priceRegex.test(price) || parseInt(price) <= 0) {
-        errors.push("Цена должна быть целым положительным числом.");
-    }
-    if (!category) {
-        errors.push("Выберите категорию из списка.");
-    }
+// 8. Обработка формы добавления товара
+ 
+if (addForm) {
+    addForm.onsubmit = (event) => {
+        event.preventDefault(); 
+        errorBlock.innerHTML = ''; 
 
-    return {
-        isValid: errors.length === 0,
-        errors: errors
+        // Получаем значения
+        const titleInput = document.getElementById('form-title').value;
+        const priceInput = document.getElementById('form-price').value;
+        const categoryInput = document.getElementById('form-category').value;
+
+        // Вызываем валидацию 
+        const validation = validateProduct(titleInput, priceInput, categoryInput);
+
+        if (validation.isValid) {
+            // Создаем объект 
+            const newProduct = {
+                id: Date.now(),
+                title: titleInput.trim(),
+                price: parseInt(priceInput),
+                category: categoryInput
+            };
+
+            // Добавляем в общий массив 
+            catalog.push(newProduct);
+            
+            // Сбрасываем фильтр и показываем всё
+            categorySelect.value = "";
+            renderList(catalog);
+            
+            addForm.reset();
+            alert("Товар добавлен в каталог!");
+        } else {
+            // Вывод ошибок пользователю
+            validation.errors.forEach(err => {
+                const errorItem = document.createElement('p');
+                errorItem.textContent = `• ${err}`;
+                errorBlock.appendChild(errorItem);
+            });
+        }
     };
+}
+
+// 9. Запуск при загрузке страницы
+window.onload = () => {
+    loadDataAsync();
 };
